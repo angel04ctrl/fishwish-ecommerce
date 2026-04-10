@@ -1,0 +1,6 @@
+com\fishwish\order\OrderApplication.class
+com\fishwish\order\repository\OrderRepository.class
+com\fishwish\order\controller\OrderController.class
+com\fishwish\order\model\OrderItem.class
+com\fishwish\order\service\OrderService.class
+com\fishwish\order\model\Order.class
