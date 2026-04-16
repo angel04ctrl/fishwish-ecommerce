@@ -1,3 +1,5 @@
+com\fishwish\order\config\RestTemplateConfig.class
+com\fishwish\order\dto\ProductDTO.class
 com\fishwish\order\OrderApplication.class
 com\fishwish\order\repository\OrderRepository.class
 com\fishwish\order\controller\OrderController.class

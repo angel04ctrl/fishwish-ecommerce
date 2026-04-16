@@ -9,7 +9,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/orders")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "*") // Permite llamadas desde cualquier Frontend (Localhost o Vercel)
 public class OrderController {
 
     private final OrderService orderService;

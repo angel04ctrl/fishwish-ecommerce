@@ -54,7 +54,10 @@ export default function CheckoutPage() {
         };
 
         try {
-            const response = await fetch('http://localhost:8082/api/orders', {
+            // Usamos variable de entorno si existe, de lo contrario usamos localhost para desarrollo local
+            const orderUrl = process.env.NEXT_PUBLIC_ORDER_URL || 'http://localhost:8082';
+
+            const response = await fetch(`${orderUrl}/api/orders`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(orderData),

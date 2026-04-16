@@ -2,6 +2,7 @@ package com.fishwish.order.service;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
@@ -18,8 +19,8 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final RestTemplate restTemplate;
 
-    // Hardcodeado para simplicidad. En producción usarías Eureka o variables de entorno.
-    private static final String PRODUCT_SERVICE_URL = "http://localhost:8081/api/products";
+    @Value("${app.product-service.url:http://localhost:8081/api/products}")
+    private String productServiceUrl;
 
     public OrderService(OrderRepository orderRepository, RestTemplate restTemplate) {
         this.orderRepository = orderRepository;
@@ -35,7 +36,7 @@ public class OrderService {
             try {
                 // 1. Obtener datos reales del producto desde product-service
                 ProductDTO product = restTemplate.getForObject(
-                        PRODUCT_SERVICE_URL + "/" + item.getProductId(), 
+                        productServiceUrl + "/" + item.getProductId(), 
                         ProductDTO.class
                 );
 
@@ -62,7 +63,7 @@ public class OrderService {
         // FASE 2: Todo validado, ahora descontamos el stock
         for (OrderItem item : order.getItems()) {
             restTemplate.put(
-                PRODUCT_SERVICE_URL + "/" + item.getProductId() + "/reduce-stock?quantity=" + item.getQuantity(), 
+                productServiceUrl + "/" + item.getProductId() + "/reduce-stock?quantity=" + item.getQuantity(), 
                 null
             );
         }
