@@ -153,12 +153,7 @@ export default function Home() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-            <h2 className="text-5xl font-bold text-gray-900 mb-4">Nuestros Snacks Naturales</h2>
-          <p className="text-xl text-gray-600">Elige el tamaño ideal para tu mascota</p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-          {products.map((product) => (          // Recorremos el array de productos
+            {products.map((product) => (          // Recorremos el array de productos
             <div 
               key={product.id}                   // key es obligatorio cuando usamos .map en React
               className="bg-white rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 group"
