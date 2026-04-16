@@ -2,9 +2,11 @@
 // Esto es obligatorio cuando usamos hooks (useState, useEffect) o eventos (onClick)
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 // useState → Permite crear variables que cambian y React las "escucha" para volver a renderizar
 // useEffect → Permite ejecutar código cuando el componente se monta o cuando cambian ciertas variables
 
+import { toast } from 'sonner';
 import { useCartStore } from '../app/lib/cartStore';
 // Importamos el store de Zustand que maneja el carrito (estado global)
 
@@ -27,6 +29,7 @@ export default function Home() {
   // Estados locales (solo viven en esta página)
   const [products, setProducts] = useState<Product[]>([]);     // Guardamos la lista de productos
   const [loading, setLoading] = useState(true);                // Para mostrar "Cargando..." mientras esperamos datos
+  const [error, setError] = useState<string | null>(null);     // Para manejar errores de conexión
   const [isCartOpen, setIsCartOpen] = useState(false);         // Controla si el modal del carrito está abierto o cerrado
 
   // Extraemos funciones y datos del carrito global (Zustand)
@@ -35,13 +38,18 @@ export default function Home() {
   // useEffect se ejecuta UNA vez cuando la página se carga
   useEffect(() => {
     fetch('http://localhost:8081/api/products')   // Hacemos petición al backend
-      .then(res => res.json())                    // Convertimos la respuesta a JSON
+      .then(res => {
+        if (!res.ok) throw new Error('Error al conectar con el servidor de productos');
+        return res.json();
+      })
       .then(data => {
         setProducts(data);                        // Guardamos los productos en el estado
+        setError(null);
         setLoading(false);                        // Ya terminamos de cargar
       })
       .catch(err => {
         console.error(err);
+        setError('No pudimos cargar los productos en este momento. Intenta de nuevo más tarde.');
         setLoading(false);                        // Aunque haya error, dejamos de mostrar "cargando"
       });
   }, []);   // El array vacío [] significa "ejecutar solo una vez al montar el componente"
@@ -49,13 +57,18 @@ export default function Home() {
   // Función que se llama cuando el usuario hace clic en "Agregar al carrito"
   const handleAddToCart = (product: Product) => {
     addToCart(product);      // Llamamos a la función del store de Zustand
+    toast.success(`¡${product.name} añadido al carrito!`);
   };
 
   // Mientras estamos cargando los productos, mostramos este mensaje
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 text-2xl">
-        Cargando snacks de FishWish...
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 text-2xl gap-6">
+        <svg className="animate-spin h-12 w-12 text-[#00A3E0]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <p className="text-gray-500 font-medium">Cargando snacks de FishWish...</p>
       </div>
     );
   }
@@ -80,10 +93,11 @@ export default function Home() {
 
           {/* Navegación */}
           <nav className="hidden md:flex gap-8 text-sm font-medium">
-            <a href="#" className="hover:text-[#00A3E0] transition-colors">Inicio</a>
-            <a href="#" className="hover:text-[#00A3E0] transition-colors">Productos</a>
-            <a href="#" className="hover:text-[#00A3E0] transition-colors">Nosotros</a>
-            <a href="#" className="hover:text-[#00A3E0] transition-colors">Impacto</a>
+            <Link href="/" className="text-[#00A3E0] transition-colors">Inicio</Link>
+            <Link href="/productos" className="hover:text-[#00A3E0] transition-colors">Productos</Link>
+            <Link href="/about" className="hover:text-[#00A3E0] transition-colors">Nosotros</Link>
+            <Link href="/impacto" className="hover:text-[#00A3E0] transition-colors">Impacto</Link>
+            <Link href="/contacto" className="hover:text-[#00A3E0] transition-colors">Contacto</Link>
           </nav>
 
           {/* Botón del carrito */}
@@ -116,8 +130,27 @@ export default function Home() {
 
       {/* ==================== LISTA DE PRODUCTOS ==================== */}
       <section className="max-w-7xl mx-auto px-6 py-20">
-        <div className="text-center mb-16">
-          <h2 className="text-5xl font-bold text-gray-900 mb-4">Nuestros Snacks Naturales</h2>
+        {error ? (
+          <div className="bg-red-50 text-red-600 p-8 rounded-3xl text-center max-w-2xl mx-auto shadow-sm border border-red-100">
+            <span className="text-4xl block mb-4">🔌</span>
+            <h3 className="text-2xl font-bold mb-2">¡Ups! Tuvimos un problema</h3>
+            <p>{error}</p>
+            <button 
+              onClick={() => window.location.reload()}
+              className="mt-6 bg-white text-red-600 px-6 py-2 rounded-xl font-semibold hover:bg-red-50 border border-red-200 transition-colors"
+            >
+              Reintentar
+            </button>
+          </div>
+        ) : products.length === 0 ? (
+          <div className="bg-white p-8 rounded-3xl text-center max-w-2xl mx-auto shadow-sm border border-gray-100">
+            <span className="text-4xl block mb-4">😔</span>
+            <h3 className="text-2xl font-bold text-gray-800 mb-2">Sin inventario</h3>
+            <p className="text-gray-500">Por el momento no tenemos productos disponibles.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+            <h2 className="text-5xl font-bold text-gray-900 mb-4">Nuestros Snacks Naturales</h2>
           <p className="text-xl text-gray-600">Elige el tamaño ideal para tu mascota</p>
         </div>
 

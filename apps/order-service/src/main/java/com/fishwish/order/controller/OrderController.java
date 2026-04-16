@@ -1,4 +1,4 @@
-﻿package com.fishwish.order.controller;
+package com.fishwish.order.controller;
 
 import com.fishwish.order.model.Order;
 import com.fishwish.order.service.OrderService;
@@ -19,13 +19,20 @@ public class OrderController {
     }
 
     @PostMapping
-    public ResponseEntity<Order> createOrder(@RequestBody Order order) {
-        Order savedOrder = orderService.createOrder(order);
-        return ResponseEntity.ok(savedOrder);
+    public ResponseEntity<?> createOrder(@RequestBody Order order) {
+        try {
+            Order savedOrder = orderService.createOrder(order);
+            return ResponseEntity.ok(savedOrder);
+        } catch (IllegalArgumentException e) {
+            // Maneja errores como "Stock insuficiente" o "Producto no existe"
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Error interno procesando la orden");
+        }
     }
 
     @GetMapping
     public List<Order> getAllOrders() {
         return orderService.getAllOrders();
     }
-} 
+}
