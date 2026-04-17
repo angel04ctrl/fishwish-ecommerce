@@ -30,10 +30,10 @@ export default function Home() {
   const [products, setProducts] = useState<Product[]>([]);     // Guardamos la lista de productos
   const [loading, setLoading] = useState(true);                // Para mostrar "Cargando..." mientras esperamos datos
   const [error, setError] = useState<string | null>(null);     // Para manejar errores de conexión
-  const [isCartOpen, setIsCartOpen] = useState(false);         // Controla si el modal del carrito está abierto o cerrado
+    const [isCartOpen, setIsCartOpen] = useState(false);         // Controla si el modal del carrito está abierto o cerrado
 
   // Extraemos funciones y datos del carrito global (Zustand)
-  const { items, addToCart, totalItems, totalPrice } = useCartStore();
+  const { addToCart, totalItems, totalPrice } = useCartStore();
 
   // useEffect se ejecuta UNA vez cuando la página se carga
   useEffect(() => {
@@ -184,8 +184,9 @@ export default function Home() {
                 </div>
               </div>
             </div>
-          ))}
-        </div>
+                    ))}
+          </div>
+        )}
       </section>
 
       {/* Modal del carrito */}
