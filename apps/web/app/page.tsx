@@ -30,10 +30,10 @@ export default function Home() {
   const [products, setProducts] = useState<Product[]>([]);     // Guardamos la lista de productos
   const [loading, setLoading] = useState(true);                // Para mostrar "Cargando..." mientras esperamos datos
   const [error, setError] = useState<string | null>(null);     // Para manejar errores de conexión
-  const [isCartOpen, setIsCartOpen] = useState(false);         // Controla si el modal del carrito está abierto o cerrado
+    const [isCartOpen, setIsCartOpen] = useState(false);         // Controla si el modal del carrito está abierto o cerrado
 
   // Extraemos funciones y datos del carrito global (Zustand)
-  const { items, addToCart, totalItems, totalPrice } = useCartStore();
+  const { addToCart, totalItems, totalPrice } = useCartStore();
 
   // useEffect se ejecuta UNA vez cuando la página se carga
   useEffect(() => {
@@ -173,23 +173,22 @@ export default function Home() {
                   <h3 className="text-2xl font-semibold text-gray-800 mb-3">{product.name}</h3>
                   <p className="text-gray-600 mb-8 leading-relaxed">{product.description}</p>
 
-                  <div className="flex justify-between items-end">
-                    <div>
-                      <span className="text-4xl font-bold text-[#003087]"> ${product.price}</span>
-                      <span className="text-gray-500"> MXN</span>
-                    </div>
-                    <button 
-                      onClick={() => handleAddToCart(product)}   // Llamamos a la función al hacer clic
-                      className="bg-[#00A3E0] hover:bg-[#0088c2] text-white px-8 py-4 rounded-2xl font-semibold transition-all active:scale-95"
-                    >
-                      Agregar al carrito
-                    </button>
+                <div className="flex justify-between items-end">
+                  <div>
+                    <span className="text-4xl font-bold text-[#003087]"> ${product.price}</span>
+                    <span className="text-gray-500"> MXN</span>
                   </div>
+                  <button 
+                    onClick={() => handleAddToCart(product)}   // Llamamos a la función al hacer clic
+                    className="bg-[#00A3E0] hover:bg-[#0088c2] text-white px-8 py-4 rounded-2xl font-semibold transition-all active:scale-95"
+                  >
+                    Agregar al carrito
+                  </button>
                 </div>
               </div>
-            ))}
-          </div>
-        )}
+            </div>
+          ))}
+        </div>
       </section>
 
       {/* Modal del carrito */}
