@@ -66,15 +66,21 @@ export default function CheckoutPage() {
             if (response.ok) {
                 const savedOrder = await response.json();
                 clearCart(); // Vaciar carrito después de guardar
-                toast.success('¡Pedido creado exitosamente!');
+                toast.success('¡Pedido creado exitosamente!', {
+                    description: 'Te redirigiremos a tu confirmación.'
+                });
                 router.push(`/order-confirmation?id=${savedOrder.id}`);
             } else {
                 const errorText = await response.text();
-                toast.error(errorText || 'Error al procesar el pedido. Intenta nuevamente.');
+                toast.error('No se pudo procesar tu pedido', {
+                    description: errorText || 'Por favor verifica la disponibilidad de los productos.'
+                });
             }
         } catch (error) {
             console.error(error);
-            toast.error('No se pudo conectar con el servidor. Verifica tu conexión.');
+            toast.error('No se pudo conectar con el servidor', {
+                description: 'Verifica tu conexión a internet e intenta nuevamente.'
+            });
         } finally {
             setLoading(false);
         }

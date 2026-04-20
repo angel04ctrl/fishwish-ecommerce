@@ -18,3 +18,8 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
+# Configuración para la comunicación entre servicios
+app:
+  product-service:
+    url: http://localhost:8081/api/products

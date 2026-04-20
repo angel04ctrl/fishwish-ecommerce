@@ -10,7 +10,7 @@ export default function AboutPage() {
   const { totalItems, totalPrice } = useCartStore();
 
   return (
-    <div className="min-h-screen bg-gray-50 font-sans">
+    <div className="min-h-screen bg-gray-50 font-sans flex flex-col">
       {/* HEADER */}
       <header className="bg-[#003087] text-white sticky top-0 z-50 shadow-lg">
         <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
@@ -58,7 +58,7 @@ export default function AboutPage() {
       </section>
 
       {/* CONTENT */}
-      <section className="max-w-5xl mx-auto px-6 py-20 space-y-20">
+      <section className="max-w-5xl mx-auto px-6 py-20 space-y-20 flex-grow">
         
         {/* Intro */}
         <div className="text-center space-y-6">
@@ -115,6 +115,34 @@ export default function AboutPage() {
         </div>
 
       </section>
+
+      {/* FOOTER */}
+      <footer className="bg-[#003087] text-white py-12 mt-auto">
+        <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-3 gap-8 text-center md:text-left">
+          <div>
+            <h3 className="text-2xl font-bold mb-4 flex items-center justify-center md:justify-start gap-2">
+              <span>🐟</span> FishWish
+            </h3>
+            <p className="opacity-80">Salud en cada mordida. <br/>Snacks naturales de Campeche.</p>
+          </div>
+          <div>
+            <h4 className="font-semibold mb-4 text-[#00A3E0]">Enlaces Rápidos</h4>
+            <ul className="space-y-2 opacity-80">
+              <li><Link href="/productos" className="hover:text-white transition">Productos</Link></li>
+              <li><Link href="/impacto" className="hover:text-white transition">Impacto</Link></li>
+              <li><Link href="/contacto" className="hover:text-white transition">Contacto</Link></li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="font-semibold mb-4 text-[#00A3E0]">Contacto</h4>
+            <p className="opacity-80">Lerma, Campeche, México</p>
+            <p className="opacity-80 mt-2">hola@fishwish.com.mx</p>
+          </div>
+        </div>
+        <div className="border-t border-white/20 mt-8 pt-8 text-center opacity-60 text-sm">
+          © {new Date().getFullYear()} FishWish. Todos los derechos reservados.
+        </div>
+      </footer>
 
       {/* Cart Modal */}
       <CartModal isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />

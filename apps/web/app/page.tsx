@@ -52,7 +52,8 @@ export default function Home() {
       })
       .catch(err => {
         console.error(err);
-        setError('No pudimos cargar los productos en este momento. Intenta de nuevo más tarde.');
+        setError('No se pudo conectar con el servidor. Verifica tu conexión a internet o intenta de nuevo más tarde.');
+        toast.error('No se pudo conectar con el servidor');
         setLoading(false);                        // Aunque haya error, dejamos de mostrar "cargando"
       });
   }, []);   // El array vacío [] significa "ejecutar solo una vez al montar el componente"
@@ -60,18 +61,20 @@ export default function Home() {
   // Función que se llama cuando el usuario hace clic en "Agregar al carrito"
   const handleAddToCart = (product: Product) => {
     addToCart(product);      // Llamamos a la función del store de Zustand
-    toast.success(`¡${product.name} añadido al carrito!`);
+    toast.success(`¡${product.name} añadido al carrito!`, {
+      description: 'Ve al carrito para finalizar tu compra.',
+    });
   };
 
   // Mientras estamos cargando los productos, mostramos este mensaje
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 text-2xl gap-6">
-        <svg className="animate-spin h-12 w-12 text-[#00A3E0]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <svg className="animate-spin h-14 w-14 text-[#00A3E0]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
         </svg>
-        <p className="text-gray-500 font-medium">Cargando snacks de FishWish...</p>
+        <p className="text-[#003087] font-semibold text-lg">Cargando el catálogo de FishWish...</p>
       </div>
     );
   }
@@ -154,38 +157,39 @@ export default function Home() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
             {products.map((product) => (          // Recorremos el array de productos
-            <div 
-              key={product.id}                   // key es obligatorio cuando usamos .map en React
-              className="bg-white rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 group"
-            >
-              {/* Imagen del producto */}
-              <div className="h-80 bg-gradient-to-br from-[#003087] to-[#00A3E0] flex items-center justify-center relative">
-                <span className="text-9xl transition-transform group-hover:scale-110 duration-500">🐟</span>
-                <div className="absolute top-6 right-6 bg-white text-[#003087] px-5 py-2 rounded-2xl font-bold shadow">
-                  {product.presentation}
-                </div>
-              </div>
-
-              <div className="p-8">
-                <h3 className="text-2xl font-semibold text-gray-800 mb-3">{product.name}</h3>
-                <p className="text-gray-600 mb-8 leading-relaxed">{product.description}</p>
-
-                <div className="flex justify-between items-end">
-                  <div>
-                    <span className="text-4xl font-bold text-[#003087]"> ${product.price}</span>
-                    <span className="text-gray-500"> MXN</span>
+              <div 
+                key={product.id}                   // key es obligatorio cuando usamos .map en React
+                className="bg-white rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 group"
+              >
+                {/* Imagen del producto */}
+                <div className="h-80 bg-gradient-to-br from-[#003087] to-[#00A3E0] flex items-center justify-center relative">
+                  <span className="text-9xl transition-transform group-hover:scale-110 duration-500">🐟</span>
+                  <div className="absolute top-6 right-6 bg-white text-[#003087] px-5 py-2 rounded-2xl font-bold shadow">
+                    {product.presentation}
                   </div>
-                  <button 
-                    onClick={() => handleAddToCart(product)}   // Llamamos a la función al hacer clic
-                    className="bg-[#00A3E0] hover:bg-[#0088c2] text-white px-8 py-4 rounded-2xl font-semibold transition-all active:scale-95"
-                  >
-                    Agregar al carrito
-                  </button>
+                </div>
+
+                <div className="p-8">
+                  <h3 className="text-2xl font-semibold text-gray-800 mb-3">{product.name}</h3>
+                  <p className="text-gray-600 mb-8 leading-relaxed">{product.description}</p>
+
+                  <div className="flex justify-between items-end">
+                    <div>
+                      <span className="text-4xl font-bold text-[#003087]"> ${product.price}</span>
+                      <span className="text-gray-500"> MXN</span>
+                    </div>
+                    <button 
+                      onClick={() => handleAddToCart(product)}   // Llamamos a la función al hacer clic
+                      className="bg-[#00A3E0] hover:bg-[#0088c2] text-white px-8 py-4 rounded-2xl font-semibold transition-all active:scale-95"
+                    >
+                      Agregar al carrito
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </section>
 
       {/* Modal del carrito */}
