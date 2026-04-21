@@ -1,11 +1,17 @@
 package com.fishwish.order.controller;
 
+import java.util.List;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.fishwish.order.model.Order;
 import com.fishwish.order.service.OrderService;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -27,7 +33,8 @@ public class OrderController {
             // Maneja errores como "Stock insuficiente" o "Producto no existe"
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Error interno procesando la orden");
+            e.printStackTrace(); // Log the exact error
+            return ResponseEntity.internalServerError().body("Error interno procesando la orden: " + e.getMessage());
         }
     }
 

@@ -135,13 +135,11 @@ public class OrderService {
       try {
         productServiceClient.updateStock(item.getProductId(), item.getQuantity());
       } catch (Exception e) {
-        // En un sistema real, aquí se manejaría la compensación.
-        // Por ejemplo, usando un patrón Saga o publicando un evento para reintentar.
-        // Para este caso, lanzamos una excepción para indicar el fallo.
+        e.printStackTrace(); // Log the exact error
         throw new IllegalStateException(
           "Error CRÍTICO: No se pudo actualizar el stock para el producto ID " +
           item.getProductId() +
-          ". El pedido se ha creado pero el stock no se descontó.",
+          ". Detalles: " + e.getMessage(),
           e
         );
       }

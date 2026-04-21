@@ -1,12 +1,13 @@
 package com.fishwish.order.client;
 
-import com.fishwish.order.dto.ProductDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import com.fishwish.order.dto.ProductDTO;
 
 /**
  * Cliente Feign para comunicarse con el microservicio 'product-service'.
@@ -32,11 +33,13 @@ public interface ProductServiceClient {
 
     /**
      * Llama al endpoint PATCH /api/products/{id}/stock en product-service para descontar stock.
+     * En Java/Feign nativo a veces PATCH da problemas si no se configura HttpComponents,
+     * pero para mantenerlo simple, usaremos un PUT.
      *
      * @param id       El ID del producto cuyo stock se va a actualizar.
      * @param quantity La cantidad a descontar del stock.
      * @return Un ResponseEntity vacío si la operación es exitosa.
      */
-    @PatchMapping("/{id}/stock")
+    @PutMapping("/{id}/stock")
     ResponseEntity<Void> updateStock(@PathVariable("id") Long id, @RequestParam("quantity") Integer quantity);
 }

@@ -6,3 +6,4 @@ com\fishwish\order\controller\OrderController.class
 com\fishwish\order\model\OrderItem.class
 com\fishwish\order\service\OrderService.class
 com\fishwish\order\model\Order.class
+com\fishwish\order\client\ProductServiceClient.class
