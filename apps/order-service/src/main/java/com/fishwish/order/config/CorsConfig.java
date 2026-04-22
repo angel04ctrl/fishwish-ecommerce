@@ -24,7 +24,7 @@ public class CorsConfig {
             "https://fishwish-ecommerce-web-five.vercel.app"
         ));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH", "HEAD"));
-        config.setAllowedHeaders(Arrays.asList("\"http://localhost:3000\", \"https://fishwish-ecommerce-web-five.vercel.app\""));
+        config.setAllowedHeaders(Arrays.asList("http://localhost:3000", "https://fishwish-ecommerce-web-five.vercel.app"));
         
         source.registerCorsConfiguration("/**", config);
         
