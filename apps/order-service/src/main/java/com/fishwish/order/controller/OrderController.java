@@ -3,7 +3,6 @@ package com.fishwish.order.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,7 +14,6 @@ import com.fishwish.order.service.OrderService;
 
 @RestController
 @RequestMapping("/api/orders")
-@CrossOrigin(origins = "*") // Permite llamadas desde cualquier Frontend (Localhost o Vercel)
 public class OrderController {
 
     private final OrderService orderService;
