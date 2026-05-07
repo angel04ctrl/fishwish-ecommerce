@@ -11,35 +11,39 @@ Se actualizó el nombre de la variable de entorno en 3 archivos:
 **Cambio:** `NEXT_PUBLIC_PRODUCT_URL` → `NEXT_PUBLIC_PRODUCT_API_URL`
 
 ### ✅ Backend - Order Service (application.yml) - YA CORREGIDO
-Se externalizada la URL del product-service:
+Se externalizó la URL del product-service:
 
-**De:**
-```yaml
-app:
-  product-service:
-    url: http://localhost:8081/api/products
-```
-
-**A:**
 ```yaml
 app:
   product-service:
     url: ${PRODUCT_SERVICE_URL:http://localhost:8081/api/products}
 ```
 
-### ✅ Backend - Order Service CORS Configuration - YA CORREGIDO
-Se corrigió la configuración de CORS que tenía headers mal configurados:
+### ✅ Backend - Database Connection (application.yml) - YA CORREGIDO
+Se cambió la conexión a BD de hardcodeada a variables de entorno de Railway:
 
 **De:**
-```java
-config.setAllowedHeaders(Arrays.asList("http://localhost:3000", "https://fishwish-ecommerce-web-five.vercel.app"));
+```yaml
+datasource:
+  url: jdbc:postgresql://localhost:5433/fishwish
+  username: fishwish
+  password: fishwish123
 ```
 
 **A:**
-```java
-config.setAllowedHeaders(Arrays.asList("*"));
-config.setExposedHeaders(Arrays.asList("*"));
+```yaml
+datasource:
+  url: jdbc:postgresql://${PGHOST}:${PGPORT}/${PGDATABASE}
+  username: ${PGUSER}
+  password: ${PGPASSWORD}
 ```
+
+**Archivos actualizados:**
+- `apps/order-service/src/main/resources/application.yml`
+- `apps/product-service/src/main/resources/application.yml`
+
+### ✅ Backend - Order Service CORS Configuration - YA CORREGIDO
+Se corrigió la configuración de CORS que tenía headers mal configurados.
 
 **Archivo:** `apps/order-service/src/main/java/com/fishwish/order/config/CorsConfig.java`
 
@@ -79,20 +83,35 @@ Las variables ya existen pero verifica que tengan estos valores exactos:
 
 ## 🚀 Próximos Pasos
 
-1. **En Railway - Order Service:**
+### 1. **Hacer Commit y Push a GitHub**
+```bash
+git add -A
+git commit -m "Fix database and product-service URL configuration for Railway"
+git push origin main
+```
+Railway se redeploy automáticamente en 1-2 minutos.
+
+### 2. **En Railway - Order Service (si no lo hace automáticamente):**
    - Ir a `Settings` → `Variables`
    - Agregar nueva variable: `PRODUCT_SERVICE_URL`
    - Valor: `https://product-service-production-0df4.up.railway.app/api/products`
    - Hacer re-deploy
 
-2. **Re-deploy en Vercel:**
-   - Hacer un nuevo deploy del frontend (puede ser con un push a main o hacer redeploy manual)
+### 3. **Verificar que los servicios se levanten correctamente:**
+   - En Railway → Logs
+   - Deberías ver:
+     ```
+     ✅ Order Service iniciado en http://localhost:8082
+     ✅ Product Service INICIADO correctamente en http://localhost:8081
+     ```
+   - Si ves errores de BD, algo sigue mal
 
-3. **Probar:**
-   - Cargar la app en Vercel
-   - Los productos deberían cargar sin error
-   - El carrito debería funcionar
-   - El checkout debería procesar pedidos
+### 4. **Probar la aplicación:**
+   - Abre https://fishwish-ecommerce-web-five.vercel.app
+   - Carga productos ✅
+   - Agrega al carrito ✅
+   - Haz checkout ✅
+   - Crea un pedido ✅
 
 ---
 
@@ -132,7 +151,23 @@ Las variables ya existen pero verifica que tengan estos valores exactos:
 - **Síntoma:** Error al hacer checkout, no se puede enviar el formulario
 - **Solución:** ✅ APLICADA - Cambiar a `config.setAllowedHeaders(Arrays.asList("*"));` y agregar `config.setExposedHeaders(Arrays.asList("*"));`
 
-### ❌ Problema 4: Variable de entorno no existe en Railway
+### ❌ Problema 4: Base de datos hardcodeada en ambos servicios (ERROR 502 en Railway)
+- **Causa:** Las URLs de base de datos estaban hardcodeadas a `localhost:5433`
+- **Archivos afectados:**
+  - `apps/order-service/src/main/resources/application.yml`
+  - `apps/product-service/src/main/resources/application.yml`
+- **Error en Railway:** HTTP 502 "connection refused"
+- **Síntoma:** Aplicaciones no podían conectar a BD y fallaban al iniciar
+- **Lo que pasaba:** Los logs de build eran correctos, pero en runtime fallaba porque no encontraba la BD
+- **Solución:** ✅ APLICADA - Usar variables de entorno que Railway proporciona automáticamente:
+```yaml
+datasource:
+  url: jdbc:postgresql://${PGHOST}:${PGPORT}/${PGDATABASE}
+  username: ${PGUSER}
+  password: ${PGPASSWORD}
+```
+
+### ❌ Problema 5: Variable de entorno no existe en Railway
 - **Causa:** No se agregó `PRODUCT_SERVICE_URL` en las variables del order-service
 - **Resultado del Error:** El placeholder usaría el default local que no funciona en producción
-- **Solución:** ⚠️ MANUAL - Agregar en Railway (paso 1 abajo)
+- **Solución:** ⚠️ MANUAL - Agregar en Railway (paso 2 abajo)
