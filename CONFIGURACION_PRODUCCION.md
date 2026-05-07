@@ -27,6 +27,22 @@ app:
     url: ${PRODUCT_SERVICE_URL:http://localhost:8081/api/products}
 ```
 
+### ✅ Backend - Order Service CORS Configuration - YA CORREGIDO
+Se corrigió la configuración de CORS que tenía headers mal configurados:
+
+**De:**
+```java
+config.setAllowedHeaders(Arrays.asList("http://localhost:3000", "https://fishwish-ecommerce-web-five.vercel.app"));
+```
+
+**A:**
+```java
+config.setAllowedHeaders(Arrays.asList("*"));
+config.setExposedHeaders(Arrays.asList("*"));
+```
+
+**Archivo:** `apps/order-service/src/main/java/com/fishwish/order/config/CorsConfig.java`
+
 ---
 
 ## 📋 Variables de Entorno Requeridas en Railway
@@ -80,17 +96,18 @@ Las variables ya existen pero verifica que tengan estos valores exactos:
 
 ---
 
-## ✅ CORS - Ya Configurado
+## ✅ CORS - Ya Corregido
 
-Ambos servicios ya permiten peticiones desde `https://fishwish-ecommerce-web-five.vercel.app`:
-
-**Product-Service (`CorsConfig.java`):**
+**Product-Service (`CorsConfig.java`):** ✅ CORRECTO
 - ✅ Permite `https://fishwish-ecommerce-web-five.vercel.app`
 - ✅ Métodos: GET, POST, PUT, DELETE, OPTIONS, PATCH, HEAD
+- ✅ Headers: `*` (acepta todos)
 
-**Order-Service (`CorsConfig.java`):**
+**Order-Service (`CorsConfig.java`):** ✅ CORREGIDO
 - ✅ Permite `https://fishwish-ecommerce-web-five.vercel.app`
 - ✅ Métodos: GET, POST, PUT, DELETE, OPTIONS, PATCH, HEAD
+- ✅ Headers: `*` (era el error - ahora está correcto)
+- ✅ Exposed Headers: `*` (ahora agregado)
 
 ---
 
@@ -106,7 +123,16 @@ Ambos servicios ya permiten peticiones desde `https://fishwish-ecommerce-web-fiv
 - **Resultado del Error:** Order-service en Railway no podía conectar con product-service
 - **Solución:** ✅ APLICADA - Usar variable de entorno `${PRODUCT_SERVICE_URL:...}`
 
-### ❌ Problema 3: Variable de entorno no existe en Railway
+### ❌ Problema 3: CORS configurado incorrectamente en Order-Service
+- **Causa:** `setAllowedHeaders()` recibía orígenes en lugar de headers HTTP
+- **Archivo:** `apps/order-service/src/main/java/com/fishwish/order/config/CorsConfig.java`
+- **Error en línea 31:** `config.setAllowedHeaders(Arrays.asList("http://localhost:3000", "https://fishwish-ecommerce-web-five.vercel.app"));`
+- **Resultado del Error:** El navegador rechaza el preflight request
+- **Error en consola:** "Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header"
+- **Síntoma:** Error al hacer checkout, no se puede enviar el formulario
+- **Solución:** ✅ APLICADA - Cambiar a `config.setAllowedHeaders(Arrays.asList("*"));` y agregar `config.setExposedHeaders(Arrays.asList("*"));`
+
+### ❌ Problema 4: Variable de entorno no existe en Railway
 - **Causa:** No se agregó `PRODUCT_SERVICE_URL` en las variables del order-service
 - **Resultado del Error:** El placeholder usaría el default local que no funciona en producción
-- **Solución:** ⚠️ MANUAL - Agregar en Railway (paso 1 arriba)
+- **Solución:** ⚠️ MANUAL - Agregar en Railway (paso 1 abajo)
