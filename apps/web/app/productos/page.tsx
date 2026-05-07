@@ -26,7 +26,7 @@ export default function ProductosPage() {
 
   useEffect(() => {
     // Usamos variable de entorno si existe, de lo contrario usamos localhost para desarrollo local
-    const productUrl = process.env.NEXT_PUBLIC_PRODUCT_URL || 'http://localhost:8081';
+    const productUrl = process.env.NEXT_PUBLIC_PRODUCT_API_URL || 'http://localhost:8081';
 
     fetch(`${productUrl}/api/products`)
       .then(res => {

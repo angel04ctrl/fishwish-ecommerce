@@ -22,4 +22,5 @@ spring:
 # Configuración para la comunicación entre servicios
 app:
   product-service:
-    url: http://localhost:8081/api/products
+    url: ${PRODUCT_SERVICE_URL:http://localhost:8081/api/products}
+
