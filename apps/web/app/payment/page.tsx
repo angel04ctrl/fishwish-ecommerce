@@ -1,14 +1,15 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react'; // Agregamos Suspense
 import { useSearchParams } from 'next/navigation';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
-import CheckoutForm from '../payment/CheckoutForm'; // Ajusta la ruta si es necesario
+import CheckoutForm from '../payment/CheckoutForm'; 
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
-export default function PaymentPage() {
+// 1. Envolvemos el contenido en una función interna
+function PaymentContent() {
   const searchParams = useSearchParams();
   const orderId = searchParams.get('orderId');
   const [clientSecret, setClientSecret] = useState("");
@@ -16,13 +17,12 @@ export default function PaymentPage() {
   useEffect(() => {
     if (!orderId) return;
 
-    // Llamamos a tu Java en Railway para obtener el permiso de cobro
     fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/payments/create-intent`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ 
         orderId: orderId,
-        amount: 15000 // Esto debería venir de tu base de datos realmente
+        amount: 15000 
       }),
     })
     .then(res => res.json())
@@ -37,11 +37,21 @@ export default function PaymentPage() {
       
       {clientSecret ? (
         <Elements options={{ clientSecret, appearance: { theme: 'stripe' } }} stripe={stripePromise}>
-          <CheckoutForm />
+          {/* ✅ CORRECCIÓN 1: Pasamos el orderId para que TypeScript no falle */}
+          <CheckoutForm orderId={orderId ?? ""} />
         </Elements>
       ) : (
         <div className="text-center py-10">Generando sesión segura...</div>
       )}
     </div>
+  );
+}
+
+// 2. Exportamos la página envuelta en Suspense para que Vercel no dé error
+export default function PaymentPage() {
+  return (
+    <Suspense fallback={<div className="text-center py-10">Cargando componentes de pago...</div>}>
+      <PaymentContent />
+    </Suspense>
   );
 }

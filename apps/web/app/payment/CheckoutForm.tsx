@@ -4,6 +4,7 @@ import { useStripe, useElements, PaymentElement } from '@stripe/react-stripe-js'
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
+
 export default function CheckoutForm({ orderId }: { orderId: string }) {
   const stripe = useStripe();
   const elements = useElements();
@@ -27,14 +28,18 @@ export default function CheckoutForm({ orderId }: { orderId: string }) {
 
     try {
       // ✅ Confirmar pago con Stripe
-      const { error: confirmError, paymentIntent } = await stripe.confirmPayment({
+      const result = await stripe.confirmPayment({
         elements,
         confirmParams: {
-          // ✅ INCLUIR orderId en return URL
-          return_url: `${window.location.origin}/order-confirmation?id=${orderId}&pi=${paymentIntent?.id || ''}`,
+          // ✅ No intentes poner el pi=${paymentIntent.id} aquí. 
+          // Stripe lo agregará automáticamente a la URL de redirección.
+          return_url: `${window.location.origin}/order-confirmation?id=${orderId}`,
         },
         redirect: "if_required",
       });
+
+      // Desestructuramos del resultado
+      const { error: confirmError, paymentIntent } = result;
 
       // ✅ Manejar errores específicos
       if (confirmError) {
@@ -65,7 +70,7 @@ export default function CheckoutForm({ orderId }: { orderId: string }) {
 
       if (paymentIntent?.status === "processing") {
         setMessage("Pago en proceso. Espera o redirigiremos cuando se complete.");
-        
+
         // ✅ Polling cada 2 segundos
         let attempts = 0;
         const pollInterval = setInterval(async () => {
@@ -73,12 +78,12 @@ export default function CheckoutForm({ orderId }: { orderId: string }) {
           try {
             const res = await fetch(`/api/orders/${orderId}/status`);
             const data = await res.json();
-            
+
             if (data.paymentStatus === "SUCCEEDED") {
               clearInterval(pollInterval);
               router.push(`/order-confirmation?id=${orderId}&status=success`);
             }
-            
+
             if (attempts >= 10) {
               clearInterval(pollInterval);
               setMessage("Pago en proceso. Revisa tu email para confirmar.");
@@ -120,11 +125,10 @@ export default function CheckoutForm({ orderId }: { orderId: string }) {
       <button
         type="submit"
         disabled={isProcessing || !stripe || !elements}
-        className={`w-full p-2 rounded text-white font-semibold ${
-          isProcessing || !stripe
+        className={`w-full p-2 rounded text-white font-semibold ${isProcessing || !stripe
             ? "bg-gray-400 cursor-not-allowed"
             : "bg-blue-600 hover:bg-blue-700"
-        }`}
+          }`}
       >
         {isProcessing ? "Procesando..." : "Pagar ahora"}
       </button>
@@ -135,7 +139,7 @@ export default function CheckoutForm({ orderId }: { orderId: string }) {
           type="button"
           onClick={() => {
             setError(null);
-            handleSubmit({ preventDefault: () => {} } as any);
+            handleSubmit({ preventDefault: () => { } } as any);
           }}
           className="w-full p-2 rounded text-blue-600 border border-blue-600 hover:bg-blue-50"
         >
