@@ -17,7 +17,10 @@ function PaymentContent() {
   useEffect(() => {
     if (!orderId) return;
 
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/payments/create-intent`, {
+    // Usar NEXT_PUBLIC_ORDER_URL que apunta al backend (order-service)
+    const backendUrl = process.env.NEXT_PUBLIC_ORDER_URL || 'http://localhost:8084';
+
+    fetch(`${backendUrl}/api/payments/create-intent`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ 
@@ -25,7 +28,12 @@ function PaymentContent() {
         amount: 15000 
       }),
     })
-    .then(res => res.json())
+    .then(res => {
+      if (!res.ok) {
+        throw new Error(`Error ${res.status}: ${res.statusText}`);
+      }
+      return res.json();
+    })
     .then(data => setClientSecret(data.clientSecret))
     .catch(err => console.error("Error obteniendo el secret:", err));
   }, [orderId]);

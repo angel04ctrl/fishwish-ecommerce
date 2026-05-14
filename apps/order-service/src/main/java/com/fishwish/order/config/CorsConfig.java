@@ -9,13 +9,13 @@ public class CorsConfig implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**") // Se aplica a todos los endpoints
+        registry.addMapping("/**")
                 .allowedOrigins(
                     "http://localhost:3000", 
                     "https://fishwish-ecommerce-web-five.vercel.app"
                 )
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")
-                .allowedHeaders("*") // Permite todos los headers para evitar problemas con Stripe
+                .allowedHeaders("*")
                 .exposedHeaders("Authorization")
                 .allowCredentials(true)
                 .maxAge(3600);
