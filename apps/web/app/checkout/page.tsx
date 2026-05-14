@@ -16,7 +16,10 @@ function CheckoutContent() {
   const orderId = searchParams.get('orderId') || "ORD-GENERICA"; 
 
   useEffect(() => {
-    fetch("https://order-service-production.up.railway.app/api/payments/create-intent", {
+    // ✅ USAR VARIABLE DE ENTORNO EN VEZ DE URL HARDCODEADA
+    const backendUrl = process.env.NEXT_PUBLIC_ORDER_URL || 'http://localhost:8084';
+
+    fetch(`${backendUrl}/api/payments/create-intent`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ 
