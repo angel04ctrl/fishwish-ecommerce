@@ -53,27 +53,39 @@ public class PaymentController {
 
         try {
             // 1. Extraer datos del frontend
-            Long orderId = Long.parseLong(data.get("orderId").toString());
+            String orderIdStr = data.get("orderId").toString();
             Double amountInPesos = Double.parseDouble(data.get("amount").toString());
             
-            System.out.println("✅ Datos parseados: orderId=" + orderId + ", amount=" + amountInPesos + " pesos");
+            System.out.println("✅ Datos parseados: orderId=" + orderIdStr + ", amount=" + amountInPesos + " pesos");
             
             // 2. ✅ Convertir pesos a centavos
             Long amountInCents = Math.round(amountInPesos * 100);
             System.out.println("✅ Convertido a centavos: " + amountInCents);
             
-            // 3. Validar que orden existe en BD
-            Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> {
-                    System.out.println("❌ ERROR: Orden no existe con ID: " + orderId);
-                    return new IllegalArgumentException("Orden no existe: " + orderId);
-                });
-            
-            System.out.println("✅ Orden encontrada en BD: " + order.getId() + " - Total: $" + order.getTotalAmount());
+            // 3. Buscar o crear orden
+            Order order = null;
+            try {
+                Long orderId = Long.parseLong(orderIdStr);
+                order = orderRepository.findById(orderId)
+                    .orElseThrow(() -> {
+                        System.out.println("⚠️ ADVERTENCIA: Orden con ID " + orderId + " no existe. Creando orden automática...");
+                        return new IllegalArgumentException("Orden no existe");
+                    });
+                System.out.println("✅ Orden encontrada en BD: " + order.getId() + " - Total: $" + order.getTotalAmount());
+            } catch (NumberFormatException e) {
+                // Si orderId no es un número válido, crear una nueva orden
+                System.out.println("⚠️ ADVERTENCIA: OrderId '" + orderIdStr + "' no es válido. Creando orden automática...");
+                order = new Order();
+                order.setCustomerName(orderIdStr);  // Guardar como nombre para referencia
+                order.setTotalAmount(amountInPesos);
+                order.setStatus("PENDING");
+                order = orderRepository.save(order);
+                System.out.println("✅ Orden creada automáticamente: ID=" + order.getId() + ", Total: $" + amountInPesos);
+            }
             
             // 4. Crear PaymentIntent en Stripe
             System.out.println("🔄 Creando PaymentIntent en Stripe...");
-            PaymentIntent intent = stripeService.createPaymentIntent(amountInCents, orderId.toString());
+            PaymentIntent intent = stripeService.createPaymentIntent(amountInCents, order.getId().toString());
             
             System.out.println("✅ PaymentIntent creado: " + intent.getId());
             
@@ -82,7 +94,7 @@ public class PaymentController {
             order.setPaymentStatus("PENDING");
             orderRepository.save(order);
             
-            System.out.println("💾 PaymentIntent guardado en BD para Orden " + orderId);
+            System.out.println("💾 PaymentIntent guardado en BD para Orden " + order.getId());
             
             // 6. Retornar al frontend
             Map<String, Object> response = new HashMap<>();
