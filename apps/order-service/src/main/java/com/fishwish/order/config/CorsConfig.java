@@ -1,6 +1,7 @@
 package com.fishwish.order.config;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -24,10 +25,16 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class CorsConfig implements WebMvcConfigurer {
 
-    private static final String LOCAL_ORIGIN = "http://localhost:3000";
-    private static final String VERCEL_ORIGIN = "https://fishwish-ecommerce-web-five.vercel.app";
-    private static final String[] ALLOWED_ORIGINS = {LOCAL_ORIGIN, VERCEL_ORIGIN};
-    private static final String[] ALLOWED_METHODS = {"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"};
+    // Usar List en lugar de array para evitar problemas de conversión
+    private static final List<String> ALLOWED_ORIGINS = Arrays.asList(
+        "http://localhost:3000", 
+        "https://fishwish-ecommerce-web-five.vercel.app"
+    );
+    
+    private static final List<String> ALLOWED_METHODS = Arrays.asList(
+        "GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"
+    );
+    
     private static final long MAX_AGE = 3600;
 
     /**
@@ -41,10 +48,10 @@ public class CorsConfig implements WebMvcConfigurer {
         CorsConfiguration config = new CorsConfiguration();
 
         // ✅ Configurar orígenes permitidos
-        config.setAllowedOrigins(Arrays.asList(ALLOWED_ORIGINS));
+        config.setAllowedOrigins(ALLOWED_ORIGINS);
         
         // ✅ Permitir todos los métodos HTTP
-        config.setAllowedMethods(Arrays.asList(ALLOWED_METHODS));
+        config.setAllowedMethods(ALLOWED_METHODS);
         
         // ✅ Permitir todos los headers (incluyendo Authorization, Content-Type, etc.)
         config.setAllowedHeaders(Arrays.asList("*"));
@@ -66,8 +73,8 @@ public class CorsConfig implements WebMvcConfigurer {
         bean.setOrder(Ordered.HIGHEST_PRECEDENCE);
         
         System.out.println("✅ CORS Filter registrado con orden HIGHEST_PRECEDENCE");
-        System.out.println("   Orígenes permitidos: " + Arrays.asList(ALLOWED_ORIGINS));
-        System.out.println("   Métodos permitidos: " + Arrays.asList(ALLOWED_METHODS));
+        System.out.println("   Orígenes permitidos: " + ALLOWED_ORIGINS);
+        System.out.println("   Métodos permitidos: " + ALLOWED_METHODS);
 
         return bean;
     }
@@ -79,8 +86,8 @@ public class CorsConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins(ALLOWED_ORIGINS)
-                .allowedMethods(ALLOWED_METHODS)
+                .allowedOrigins(ALLOWED_ORIGINS.toArray(new String[0]))
+                .allowedMethods(ALLOWED_METHODS.toArray(new String[0]))
                 .allowedHeaders("*")
                 .exposedHeaders("Authorization", "X-Total-Count", "X-Page-Count")
                 .allowCredentials(true)
