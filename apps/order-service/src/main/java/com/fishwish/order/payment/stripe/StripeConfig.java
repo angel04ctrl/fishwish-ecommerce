@@ -15,7 +15,8 @@ import jakarta.annotation.PostConstruct;
 public class StripeConfig {
 
     // Lee la clave secreta de application.yml (que lee de ${STRIPE_SECRET_KEY})
-    @Value("${payment.stripe.secret-key}")
+    // Usa valor por defecto vacío si no existe para evitar crashes en inicialización
+    @Value("${payment.stripe.secret-key:}")
     private String secretKey;
 
     // Lee la clave pública para información (opcional)
@@ -24,22 +25,21 @@ public class StripeConfig {
 
     @PostConstruct
     public void init() {
-        // ✅ Validar que la clave secreta está configurada
+        // ✅ Si la clave está vacía, solo logear warning (no crashear la app)
         if (secretKey == null || secretKey.trim().isEmpty()) {
-            throw new IllegalStateException(
-                "❌ ERROR CRÍTICO: STRIPE_SECRET_KEY no está configurada.\n" +
-                "   En Railway: Agrega esta variable de entorno\n" +
-                "   En local: Configura en application.yml"
-            );
+            System.out.println("⚠️  WARNING: STRIPE_SECRET_KEY no configurada.");
+            System.out.println("   Los pagos con Stripe no funcionarán hasta que se configure.");
+            System.out.println("   En Railway: Agrega la variable de entorno STRIPE_SECRET_KEY");
+            System.out.println("   En local: Agrega payment.stripe.secret-key en application.yml");
+            return;  // No crashear, solo retornar
         }
 
         // ✅ Validar formato de clave secreta (debe empezar con sk_)
         if (!secretKey.startsWith("sk_")) {
-            throw new IllegalStateException(
-                "❌ ERROR: STRIPE_SECRET_KEY no tiene el formato correcto.\n" +
-                "   Debe empezar con 'sk_' (clave secreta)\n" +
-                "   Clave detectada: " + secretKey.substring(0, Math.min(10, secretKey.length())) + "..."
-            );
+            System.out.println("⚠️  WARNING: STRIPE_SECRET_KEY no tiene el formato correcto.");
+            System.out.println("   Debe empezar con 'sk_' (clave secreta)");
+            System.out.println("   Clave detectada: " + secretKey.substring(0, Math.min(10, secretKey.length())) + "...");
+            return;  // No crashear, solo retornar
         }
 
         // ✅ Configurar Stripe con la clave secreta
