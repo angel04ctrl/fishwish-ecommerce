@@ -3,6 +3,7 @@ package com.fishwish.order.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,6 +15,15 @@ import com.fishwish.order.service.OrderService;
 
 @RestController
 @RequestMapping("/api/orders")
+@CrossOrigin(
+    origins = {"http://localhost:3000", "https://fishwish-ecommerce-web-five.vercel.app"},
+    methods = {org.springframework.web.bind.annotation.RequestMethod.GET, 
+               org.springframework.web.bind.annotation.RequestMethod.POST, 
+               org.springframework.web.bind.annotation.RequestMethod.OPTIONS},
+    allowedHeaders = {"*"},
+    allowCredentials = "true",
+    maxAge = 3600
+)
 public class OrderController {
 
     private final OrderService orderService;

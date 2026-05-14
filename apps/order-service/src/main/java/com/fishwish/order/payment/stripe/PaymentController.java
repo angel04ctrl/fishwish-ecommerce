@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -24,6 +25,15 @@ import com.stripe.model.PaymentIntent;
  */
 @RestController
 @RequestMapping("/api/payments")
+@CrossOrigin(
+    origins = {"http://localhost:3000", "https://fishwish-ecommerce-web-five.vercel.app"},
+    methods = {org.springframework.web.bind.annotation.RequestMethod.GET, 
+               org.springframework.web.bind.annotation.RequestMethod.POST, 
+               org.springframework.web.bind.annotation.RequestMethod.OPTIONS},
+    allowedHeaders = {"*"},
+    allowCredentials = "true",
+    maxAge = 3600
+)
 public class PaymentController {
 
     @Autowired
