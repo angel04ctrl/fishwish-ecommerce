@@ -14,13 +14,18 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
+    show-sql: false  # ⚠️ CAMBIAR A FALSE EN PRODUCCIÓN
     properties:
       hibernate:
-        format_sql: true
+        format_sql: false
 
-# Configuración para la comunicación entre servicios
 app:
   product-service:
     url: ${PRODUCT_SERVICE_URL:http://localhost:8081/api/products}
 
+# ✅ CORRECCIÓN CRÍTICA: Usar variables ENV sin hardcodear
+payment:
+  stripe:
+    secret-key: ${STRIPE_SECRET_KEY}  # Lee de variable ENV
+    public-key: ${STRIPE_PUBLIC_KEY}
+    webhook-secret: ${STRIPE_WEBHOOK_SECRET}
