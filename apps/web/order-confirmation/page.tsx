@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useCartStore } from '../app/lib/cartStore';
 
 interface Order {
   id: number;
@@ -21,6 +22,7 @@ interface Order {
 export default function OrderConfirmationPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { clearCart } = useCartStore();
   const orderId = searchParams.get('id');
 
   const [order, setOrder] = useState<Order | null>(null);
@@ -32,6 +34,9 @@ export default function OrderConfirmationPage() {
       return;
     }
 
+    // 🔥 LIMPIAR EL CARRITO COMO MEDIDA ADICIONAL DE SEGURIDAD
+    clearCart();
+
     // Por ahora mostramos datos simulados (más adelante podemos traerlos del backend)
     setOrder({
       id: parseInt(orderId),
@@ -42,7 +47,7 @@ export default function OrderConfirmationPage() {
       items: [] // se llenará desde el carrito si queremos
     });
     setLoading(false);
-  }, [orderId, router]);
+  }, [orderId, router, clearCart]);
 
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center">Cargando confirmación...</div>;

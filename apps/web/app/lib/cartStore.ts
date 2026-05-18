@@ -16,8 +16,11 @@ interface CartStore {
   increaseQuantity: (id: number) => void;
   decreaseQuantity: (id: number) => void;
   clearCart: () => void;
+  getItems: () => CartItem[];
   totalItems: () => number;
   totalPrice: () => number;
+  isEmpty: () => boolean;
+  updateCart: (items: CartItem[]) => void;
 }
 
 export const useCartStore = create<CartStore>()(
@@ -69,7 +72,19 @@ export const useCartStore = create<CartStore>()(
         }));
       },
 
-      clearCart: () => set({ items: [] }),
+      // ✅ Limpiar carrito de forma segura
+      clearCart: () => {
+        set({ items: [] });
+        // Forzar revalidación de localStorage
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('fishwish-cart-storage');
+        }
+      },
+
+      // ✅ Obtener items de forma segura
+      getItems: () => {
+        return [...get().items];
+      },
 
       totalItems: () => {
         return get().items.reduce((sum, item) => sum + item.quantity, 0);
@@ -77,6 +92,16 @@ export const useCartStore = create<CartStore>()(
 
       totalPrice: () => {
         return get().items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+      },
+
+      // ✅ Verificar si el carrito está vacío
+      isEmpty: () => {
+        return get().items.length === 0;
+      },
+
+      // ✅ Actualizar carrito completo (útil para sincronización)
+      updateCart: (items) => {
+        set({ items: items.filter(item => item.quantity > 0) });
       },
     }),
     {

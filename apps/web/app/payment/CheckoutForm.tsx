@@ -3,12 +3,14 @@
 import { useStripe, useElements, PaymentElement } from '@stripe/react-stripe-js';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useCartStore } from '../lib/cartStore';
 
 
 export default function CheckoutForm({ orderId }: { orderId: string }) {
   const stripe = useStripe();
   const elements = useElements();
   const router = useRouter();
+  const { clearCart, items, totalPrice } = useCartStore();
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -59,7 +61,11 @@ export default function CheckoutForm({ orderId }: { orderId: string }) {
 
       // ✅ Pago exitoso
       if (paymentIntent?.status === "succeeded") {
-        setMessage("✅ Pago exitoso. Redirigiendo...");
+        setMessage("✅ Pago exitoso. Limpiando carrito y redirigiendo...");
+        
+        // 🔥 LIMPIAR EL CARRITO AQUÍ
+        clearCart();
+        
         setTimeout(() => {
           router.push(
             `/order-confirmation?id=${orderId}&payment_intent=${paymentIntent.id}&status=success`
