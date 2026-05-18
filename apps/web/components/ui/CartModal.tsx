@@ -82,16 +82,16 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
             <div className="flex flex-col gap-3">
               <Link 
                 href="/cart"
-                onClick={onClose}
                 className="bg-gray-800 hover:bg-gray-900 text-white py-4 rounded-2xl text-center font-semibold transition"
+                onClick={onClose}
               >
                 Ver Carrito Completo
               </Link>
 
               <Link 
                 href="/checkout"
-                onClick={onClose}
                 className="bg-[#00A3E0] hover:bg-[#0088c2] text-white py-4 rounded-2xl text-center font-semibold transition"
+                onClick={onClose}
               >
                 Finalizar Compra
               </Link>
